@@ -1,0 +1,13 @@
+[package]
+name = "sensible_widgets"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = "0.4.39"
+chunks-rs = "0.7.3"
+dbus = "0.9.7"
+derive_more = { version = "1.0.0", features = ["full"] }
+serde = { version = "1.0.217", features = ["derive"] }
+snafu = { version = "0.8.5", features = ["backtrace", "futures"] }
+tokio = { version = "1.42.0", features = ["full"] }
