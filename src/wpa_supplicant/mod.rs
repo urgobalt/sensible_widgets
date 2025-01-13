@@ -1,7 +1,7 @@
 use dbus::blocking::stdintf::org_freedesktop_dbus::{ObjectManager, Properties};
 use dbus::blocking::{Connection, Proxy};
 
-mod interface;
+pub mod interface;
 
 use crate::dbus_access::Accessor;
 use crate::error::SystemError;
@@ -11,7 +11,7 @@ use self::interface::Interface;
 const DBUS_INTERFACE: &str = "fi.w1.wpa_supplicant1";
 const DBUS_PATH: &str = "/fi/w1/wpa_supplicant1";
 
-struct WPASupplicant<'a> {
+pub struct WPASupplicant<'a> {
     accessor: Accessor<'a>,
 }
 
