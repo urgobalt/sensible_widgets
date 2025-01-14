@@ -1,14 +1,18 @@
+#![feature(let_chains, string_from_utf8_lossy_owned)]
+
 use std::fmt::Debug;
 
 use chunks_rs::position::{Edge, EdgeConfig, Layer};
 use chunks_rs::utils::{load_css, tag_label};
 use chunks_rs::widgets::Chunk;
 use chunks_rs::{Factory, GtkApp, Internal};
+use zbus::Connection;
 
-mod dbus_access;
+use self::error::HandleDbusError;
+use self::network::get_network;
+
 mod error;
 mod network;
-mod wpa_supplicant;
 
 const STYLE: &str = "
 window {
@@ -22,42 +26,18 @@ window {
 }
 ";
 
-fn main() {
-    let factory = Factory::new("chunks.factory");
+#[tokio::main]
+async fn main() -> Result<(), error::MainError> {
+    let connection = Connection::system().await.handling_system()?;
+    println!("{:?}", get_network(&connection).await.unwrap_err());
 
-    let chunks = |factory: GtkApp| {
-        let right = right(&factory);
+    Ok(())
 
-        load_css(STYLE);
-    };
-
-    factory.pollute(chunks);
-}
-
-fn right(factory: &GtkApp) {
-    let tag = tag_label("right");
-    let margins = vec![(Edge::Right, 20), (Edge::Top, 20)];
-    let anchors = EdgeConfig::TOP_RIGHT.to_vec();
-
-    let storage_closure = || {
-        let network = Internal::get_network();
-        if let Ok(network) = network {
-            return format!("<span foreground='#FFFFFF'>{:.0}%</span>", network,);
-        }
-        println!("failed getting the network: {:?}", network.unwrap_err());
-        String::new()
-    };
-
-    Internal::update_storage(&tag, storage_closure);
-
-    Chunk::new(
-        factory.clone(),
-        "Network",
-        tag,
-        margins,
-        anchors,
-        Layer::Bottom,
-        false, // change to true for tag_revealer
-    )
-    .build();
+    // let factory = Factory::new("chunks.factory");
+    //
+    // let chunks = |factory: GtkApp| {
+    //     load_css(STYLE);
+    // };
+    //
+    // factory.pollute(chunks);
 }
